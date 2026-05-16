@@ -92,7 +92,14 @@ re.on_frame(function()
         local corAtual = pronto and corPronto or corRecarga
         draw_list:add_rect_filled({ posX, posY }, { posX + (larguraBarra * progresso), posY + alturaBarra }, corAtual)
 
-        local texto = pronto and "BOOST DISPONÍVEL" or "RECUPERANDO FÔLEGO PARA BOOST"
+        local segundosRestantes = math.max(tempoCooldown - tempoPassado, 0)
+        local texto
+
+        if pronto then
+            texto = "BOOST DISPONÍVEL"
+        else
+            texto = string.format("RECUPERANDO FÔLEGO: %.1fs", segundosRestantes)
+        end
 
         imgui.push_font(0)
         draw_list:add_text({ posX, posY - 25 }, corAtual, texto)
