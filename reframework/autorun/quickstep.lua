@@ -92,8 +92,11 @@ re.on_frame(function()
         local corAtual = pronto and corPronto or corRecarga
         draw_list:add_rect_filled({ posX, posY }, { posX + (larguraBarra * progresso), posY + alturaBarra }, corAtual)
 
-        local texto = pronto and "FÔLEGO PARA BOOST" or "RECUPERANDO FÔLEGO PARA BOOST"
-        draw_list:add_text({ posX, posY - 20 }, corAtual, texto)
+        local texto = pronto and "BOOST DISPONÍVEL" or "RECUPERANDO FÔLEGO PARA BOOST"
+
+        imgui.push_font(0)
+        draw_list:add_text({ posX, posY - 25 }, corAtual, texto)
+        imgui.pop_font()
     end
 
     local survivorManager = sdk.get_managed_singleton("app.ropeway.SurvivorManager")
