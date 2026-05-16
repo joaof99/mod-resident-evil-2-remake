@@ -8,10 +8,13 @@ local tempoCooldown = 2.0
 local velocidadeBoost = 1.55
 local duracaoBoost = 0.6
 
+local exibirBarra = true
+
 local VALORES_PADRAO = {
     velocidadeBoost = 1.55,
     tempoCooldown = 2.0,
-    duracaoBoost = 0.6
+    duracaoBoost = 0.6,
+    exibirBarra = true
 }
 
 local gp_singleton = sdk.get_native_singleton("via.hid.Gamepad")
@@ -46,21 +49,24 @@ re.on_draw_ui(function()
             tempoCooldown = novoCooldown
         end
 
+        local mudouVisibilidade, novaVisibilidade = imgui.checkbox("Exibir Barra de Fôlego", exibirBarra)
+        if mudouVisibilidade then
+            exibirBarra = novaVisibilidade
+        end
+        ------------------------------------------------------------------
+
         imgui.spacing()
 
         if imgui.button("Resetar valores padrão") then
-            resetarValoresPadrao()
+            velocidadeBoost = VALORES_PADRAO.velocidadeBoost
+            duracaoBoost = VALORES_PADRAO.duracaoBoost
+            tempoCooldown = VALORES_PADRAO.tempoCooldown
+            exibirBarra = true
         end
 
         imgui.tree_pop()
     end
 end)
-
-local function resetarValoresPadrao()
-    velocidadeBoost = VALORES_PADRAO.velocidadeBoost
-    duracaoBoost = VALORES_PADRAO.duracaoBoost
-    tempoCooldown = VALORES_PADRAO.tempoCooldown
-end
 
 re.on_frame(function()
     local agora = os.clock()
@@ -68,19 +74,21 @@ re.on_frame(function()
     local pronto = tempoPassado >= tempoCooldown
     local progresso = math.min(tempoPassado / tempoCooldown, 1.0)
 
-    local draw_list = imgui.get_foreground_draw_list()
+    if exibirBarra then
+        local draw_list = imgui.get_foreground_draw_list()
 
-    local corFundo = 0xFF444444 -- Cinza escuro
-    local corPronto = 0xFF00FF00 -- Verde
-    local corRecarga = 0xFF0000FF -- Vermelho
+        local corFundo = 0xFF444444 -- Cinza escuro
+        local corPronto = 0xFF00FF00 -- Verde
+        local corRecarga = 0xFF0000FF -- Vermelho
 
-    draw_list:add_rect_filled({ posX, posY }, { posX + larguraBarra, posY + alturaBarra }, corFundo)
+        draw_list:add_rect_filled({ posX, posY }, { posX + larguraBarra, posY + alturaBarra }, corFundo)
 
-    local corAtual = pronto and corPronto or corRecarga
-    draw_list:add_rect_filled({ posX, posY }, { posX + (larguraBarra * progresso), posY + alturaBarra }, corAtual)
+        local corAtual = pronto and corPronto or corRecarga
+        draw_list:add_rect_filled({ posX, posY }, { posX + (larguraBarra * progresso), posY + alturaBarra }, corAtual)
 
-    local texto = pronto and "FÔLEGO PARA BOOST" or "RECUPERANDO FÔLEGO PARA BOOST"
-    draw_list:add_text({ posX, posY - 20 }, corAtual, texto)
+        local texto = pronto and "FÔLEGO PARA BOOST" or "RECUPERANDO FÔLEGO PARA BOOST"
+        draw_list:add_text({ posX, posY - 20 }, corAtual, texto)
+    end
 
     local survivorManager = sdk.get_managed_singleton("app.ropeway.SurvivorManager")
     local player = survivorManager and survivorManager:get_field("<Player>k__BackingField")
