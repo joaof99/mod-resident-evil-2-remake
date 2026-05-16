@@ -17,6 +17,12 @@ local VALORES_PADRAO = {
     exibirBarra = true
 }
 
+local CORES = {
+    cinzaEscuro = 0xFF444444,
+    verde = 0xFF00FF00,
+    vermelho = 0xFF0000FF
+}
+
 local gp_singleton = sdk.get_native_singleton("via.hid.Gamepad")
 local gp_typedef = sdk.find_type_definition("via.hid.GamePad")
 
@@ -77,9 +83,9 @@ re.on_frame(function()
     if exibirBarra then
         local draw_list = imgui.get_foreground_draw_list()
 
-        local corFundo = 0xFF444444 -- Cinza escuro
-        local corPronto = 0xFF00FF00 -- Verde
-        local corRecarga = 0xFF0000FF -- Vermelho
+        local corFundo = CORES.cinzaEscuro
+        local corPronto = CORES.verde
+        local corRecarga = CORES.vermelho
 
         draw_list:add_rect_filled({ posX, posY }, { posX + larguraBarra, posY + alturaBarra }, corFundo)
 
